@@ -1,11 +1,5 @@
-# Vert.x Websocket Chat
+ChatApp
 
-Creating a websocket chat using a http server verticle and a websocket verticle.
+Run chatapp-1.0-fat.jar (by double clicking or "java -jar chatapp-1.0-fat.jar")
 
-Please feel free to have a look at my blog at [www.hascode.com] for more information.
-
-----
-
-**2013 Micha Kops / hasCode.com**
-
-   [www.hascode.com]:http://www.hascode.com/
+Go to http://localhost:8080

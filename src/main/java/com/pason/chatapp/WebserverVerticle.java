@@ -20,9 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class WebserverVerticle extends Verticle {
-	public static void main(String[] args) {
-	}
-
+	
 	@Override
 	public void start() {
 		final Pattern chatUrlPattern = Pattern.compile("/chat/(\\w+)");
