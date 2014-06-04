@@ -1,0 +1,5 @@
+src/main/resources
+bin
+out/production/vertx-websocket-chat
+out/test/vertx-websocket-chat
+build/deps
