@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.EventBus;
@@ -26,6 +28,8 @@ public class WebserverVerticle extends Verticle {
 		final Pattern chatUrlPattern = Pattern.compile("/chat/(\\w+)");
 		final EventBus eventBus = vertx.eventBus();
 		final Logger logger = container.logger();
+		
+		container.deployVerticle("com.pason.chatapp.MessageFilterVerticle");
 
 		RouteMatcher httpRouteMatcher = new RouteMatcher().get("/", new Handler<HttpServerRequest>() {
 			@Override
@@ -40,6 +44,17 @@ public class WebserverVerticle extends Verticle {
 		});
 
 		vertx.createHttpServer().requestHandler(httpRouteMatcher).listen(8080, "localhost");
+		
+		eventBus.registerHandler("finalsend", new Handler<Message<String>>() {
+		    public void handle(Message<String> message) {
+		    	
+		    	int index = message.body().lastIndexOf("}");
+		    	String address = message.body().substring(index + 1);
+		    	String data = message.body().substring(0, index + 1);
+		    	eventBus.send(address, data);
+		    	address = "";
+		    }
+		});
 
 		vertx.createHttpServer().websocketHandler(new Handler<ServerWebSocket>() {
 			@Override
@@ -68,14 +83,27 @@ public class WebserverVerticle extends Verticle {
 					@Override
 					public void handle(final Buffer data) {
 
+						
 						ObjectMapper m = new ObjectMapper();
 						try {
 							JsonNode rootNode = m.readTree(data.toString());
 							((ObjectNode) rootNode).put("received", new Date().toString());
+							
 							String jsonOutput = m.writeValueAsString(rootNode);
 							logger.info("json generated: " + jsonOutput);
 							for (Object chatter : vertx.sharedData().getSet("chat.room." + chatRoom)) {
-								eventBus.send((String) chatter, jsonOutput);
+								
+								
+								
+								String address = (String)chatter;
+								eventBus.send("test.address", jsonOutput + address);
+								
+								
+								
+								
+
+								
+								
 							}
 						} catch (IOException e) {
 							ws.reject();
