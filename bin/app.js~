@@ -4,4 +4,4 @@ var container = require('vertx/container')
 
 container.deployVerticle("com.pason.chatapp.WebserverVerticle");
 container.deployVerticle("com.pason.chatapp.MotD");
-container.deployVerticle("");
+//container.deployVerticle("accuweather.py");

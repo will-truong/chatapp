@@ -47,9 +47,10 @@ public class MessageFilterVerticle extends Verticle {
 		    	for(int x = 0; x < buzz.length; x++){
 		    		String buzzword = buzz[x];
 		    	
-		    	if(check.equals(buzzword)){
+		    	if(check.contains(buzzword)){
+		    		check = check.replace(buzzword, "$#$#%&");
 		    		
-		    		((ObjectNode) rootNode).put("message", "!#$%^&");
+		    		((ObjectNode) rootNode).put("message", check);
 		    	}
 		    }
 				String jsonOutput = m.writeValueAsString(rootNode);
