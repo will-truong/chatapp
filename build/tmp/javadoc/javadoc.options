@@ -3,4 +3,5 @@
 -doctitle 'chatapp 1.0 API'
 -quiet 
 -windowtitle 'chatapp 1.0 API'
+'/home/wtruong/chatapp/src/main/java/com/pason/chatapp/MotD.java'
 '/home/wtruong/chatapp/src/main/java/com/pason/chatapp/WebserverVerticle.java'

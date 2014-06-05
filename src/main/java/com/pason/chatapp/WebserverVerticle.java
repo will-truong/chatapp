@@ -54,6 +54,7 @@ public class WebserverVerticle extends Verticle {
 				final String id = ws.textHandlerID();
 				logger.info("registering new connection with id: " + id + " for chat-room: " + chatRoom);
 				vertx.sharedData().getSet("chat.room." + chatRoom).add(id);
+				eventBus.send("incoming.user", id);
 
 				ws.closeHandler(new Handler<Void>() {
 					@Override
