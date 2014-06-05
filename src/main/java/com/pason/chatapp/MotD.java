@@ -24,17 +24,38 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 //sends a message of the day every time a user connects
 public class MotD extends Verticle {
-	String motd = "sup man, the time is " + new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime());
+	final String original = "sup man, the time is " + new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime()) + ". it's %CONDITION% and %TEMP% degrees right now";
+	String motd = original;
 
 	@Override
-	public void start() {		
+	public void start() {
+		vertx.setPeriodic(1000, new Handler<Long>() {
+			public void handle(Long event) {
+				weatherRequest();
+			}
+		});
 		vertx.eventBus().registerHandler("incoming.user", new Handler<Message>() {
 			@Override
 			public void handle(Message message) {
 				String chatter = message.body().toString();
-				System.out.println("bot.motd received incoming user: " + chatter + ", gonna reply with motd");
 				vertx.eventBus().send(chatter, "{\"message\":\"" + motd + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}");				
 			}
+		});
+	}
+	
+	public void weatherRequest() {
+		vertx.eventBus().send("request.weather", "", new Handler<Message>() {
+
+			@Override
+			public void handle(Message event) {
+				motd = original;
+				String html = (String) event.body();
+				String condition = html.split(",")[0];
+				String temp = html.split(",")[1];
+				motd = motd.replace("%CONDITION%", condition.toLowerCase());
+				motd = motd.replace("%TEMP%", temp);
+			}
+			
 		});
 	}
 }

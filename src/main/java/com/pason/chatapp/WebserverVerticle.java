@@ -49,7 +49,6 @@ public class WebserverVerticle extends Verticle {
 					ws.reject();
 					return;
 				}
-				System.out.println(ws.localAddress() + " " + ws.remoteAddress());
 
 				final String chatRoom = m.group(1);
 				final String id = ws.textHandlerID();
