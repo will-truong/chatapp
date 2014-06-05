@@ -29,8 +29,6 @@ public class WebserverVerticle extends Verticle {
 		final EventBus eventBus = vertx.eventBus();
 		final Logger logger = container.logger();
 		
-		container.deployVerticle("com.pason.chatapp.MessageFilterVerticle");
-
 		RouteMatcher httpRouteMatcher = new RouteMatcher().get("/", new Handler<HttpServerRequest>() {
 			@Override
 			public void handle(final HttpServerRequest request) {
