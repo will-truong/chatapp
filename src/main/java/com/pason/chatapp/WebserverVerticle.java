@@ -23,6 +23,8 @@ public class WebserverVerticle extends Verticle {
 	
 	@Override
 	public void start() {
+		System.out.println("STARTING WEBSERVER");
+		container.deployVerticle("com.pason.chatapp.MotD");
 		final Pattern chatUrlPattern = Pattern.compile("/chat/(\\w+)");
 		final EventBus eventBus = vertx.eventBus();
 		final Logger logger = container.logger();
@@ -49,11 +51,13 @@ public class WebserverVerticle extends Verticle {
 					ws.reject();
 					return;
 				}
+				System.out.println(ws.localAddress() + " " + ws.remoteAddress());
 
 				final String chatRoom = m.group(1);
 				final String id = ws.textHandlerID();
 				logger.info("registering new connection with id: " + id + " for chat-room: " + chatRoom);
 				vertx.sharedData().getSet("chat.room." + chatRoom).add(id);
+				eventBus.send("bot.motd", "incoming.user." + id + "chat.room" + chatRoom);
 
 				ws.closeHandler(new Handler<Void>() {
 					@Override
@@ -75,6 +79,7 @@ public class WebserverVerticle extends Verticle {
 							logger.info("json generated: " + jsonOutput);
 							for (Object chatter : vertx.sharedData().getSet("chat.room." + chatRoom)) {
 								eventBus.send((String) chatter, jsonOutput);
+								System.out.println(chatter);
 							}
 						} catch (IOException e) {
 							ws.reject();
