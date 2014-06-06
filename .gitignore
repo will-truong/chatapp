@@ -3,3 +3,6 @@
 .classpath
 target
 infinitest.filters
+bin
+build
+.gradle
