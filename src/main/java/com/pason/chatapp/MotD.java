@@ -57,11 +57,11 @@ public class MotD extends Verticle {
 					for (Object chatter : vertx.sharedData().getSet("chat.room." + content)) {	
 //						System.out.println("sending motd to " + (String)chatter);
 						String address = (String)chatter;
-						vertx.eventBus().send("finalsend", "{\"message\":\"" + greeting + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}" + address);								
+						vertx.eventBus().send("test.address", "{\"message\":\"" + greeting + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}" + address);								
 					}
 				}
 				else
-					vertx.eventBus().send("finalsend", "{\"message\":\"" + greeting + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}" + content);
+					vertx.eventBus().send("test.address", "{\"message\":\"" + greeting + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}" + content);
 			}
 		};
 		vertx.eventBus().registerHandler("incoming.user", sendMotd);
@@ -82,7 +82,7 @@ public class MotD extends Verticle {
 				motd = motd.replace("%TEMP%", temp);
 				weatherReceived = true;
 			}
-			
+			 
 		});
 		//System.out.println("sent weather request");
 	}
