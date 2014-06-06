@@ -6,8 +6,8 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 import org.vertx.java.core.eventbus.Message;
+import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.EventBus;
@@ -87,12 +87,23 @@ public class WebserverVerticle extends Verticle {
 							((ObjectNode) rootNode).put("received", new Date().toString());
 							String jsonOutput = m.writeValueAsString(rootNode);
 							logger.info("json generated: " + jsonOutput);
+							final String backupjson =  jsonOutput;
 							String message = ((ObjectNode) rootNode).get("message").toString();
 							message = message.substring(1, message.length()-1);
 							if(message.length() > 0) {
 								for (Object chatter : vertx.sharedData().getSet("chat.room." + chatRoom)) {
-									String address = (String)chatter;
-									eventBus.send("test.address", jsonOutput + address);								
+									final String address = (String)chatter;
+									vertx.eventBus().sendWithTimeout("test.address", jsonOutput + address,20,new Handler<AsyncResult<Message<String>>>() {
+									    public void handle(AsyncResult<Message<String>> result) {
+									        if (result.succeeded()) {
+									           
+									        } else {
+									        	
+	                                                   vertx.eventBus().send(address, backupjson);
+									            
+									        }
+									    }
+									});										
 								}
 								if(message.charAt(0) == '/') {
 									if(message.contains(" "))

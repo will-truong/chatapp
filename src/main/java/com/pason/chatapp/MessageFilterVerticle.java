@@ -31,6 +31,7 @@ public class MessageFilterVerticle extends Verticle {
            
 		vertx.eventBus().registerHandler("test.address",new Handler<Message<String>>() {
 		    public void handle(Message<String> message) {
+		    	message.reply();
 		    	ObjectMapper m = new ObjectMapper();
 		    	String data = message.body();
 		    	int index = data.lastIndexOf("}");
@@ -44,21 +45,28 @@ public class MessageFilterVerticle extends Verticle {
 		    	
 		    	check = check.replaceAll("\"","");
 		    	
-		    	for(int x = 0; x < buzz.length; x++){
-		    		String buzzword = buzz[x];
+		    	String [] words = check.split(" ");
+		    	Set<String> yes = new HashSet<String>(Arrays.asList(buzz));
+		    	String newmessage = "";
+		    	System.out.println("Made it past set");
 		    	
-		    	if(check.contains(buzzword)){
-		    		check = check.replace(buzzword, "$#$#%&");
+		    	for(int x = 0; x < words.length; x++){
+		    		String buzzword = words[x];
+		    		System.out.println("In for loop, this is current word      " + buzzword);
+		    	if(yes.contains(buzzword)){
+		    		buzzword = "@$^&^@#";
+		    		System.out.println("it contains a bad word!");
 		    		
-		    		((ObjectNode) rootNode).put("message", check);
 		    	}
+		    	System.out.println("added to new message");
+		    	newmessage += buzzword + " ";
 		    }
+		    	System.out.println("Out of for loop");
+		    	((ObjectNode) rootNode).put("message", newmessage);
 				String jsonOutput = m.writeValueAsString(rootNode);
-		    			    	
-		    	vertx.eventBus().send("finalsend", jsonOutput + addresshold); /*
-		    	jsonOutput = "";
-		    	data = "";
-		    	addresshold = ""; */
+				System.out.println("About to be sent");
+		    	vertx.eventBus().send(addresshold, jsonOutput); 
+		    	
 		    }
 		    	catch(IOException e){
 		    		System.err.println("Uh Oh");
@@ -71,4 +79,3 @@ public class MessageFilterVerticle extends Verticle {
 	}
 	
 }
-
