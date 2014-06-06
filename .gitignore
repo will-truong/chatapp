@@ -6,3 +6,5 @@ infinitest.filters
 bin
 build
 .gradle
+.metadata~
+.metadata
