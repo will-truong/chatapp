@@ -46,11 +46,10 @@ public class WebserverVerticle extends Verticle {
 		eventBus.registerHandler("finalsend", new Handler<Message<String>>() {
 		    public void handle(Message<String> message) {
 		    	
-		    	int index = message.body().lastIndexOf("}");
+		    	int index = message.body().lastIndexOf("}");		    	
 		    	String address = message.body().substring(index + 1);
 		    	String data = message.body().substring(0, index + 1);
 		    	eventBus.send(address, data);
-		    	address = "";
 		    }
 		});
 
@@ -86,22 +85,20 @@ public class WebserverVerticle extends Verticle {
 						try {
 							JsonNode rootNode = m.readTree(data.toString());
 							((ObjectNode) rootNode).put("received", new Date().toString());
-							
 							String jsonOutput = m.writeValueAsString(rootNode);
 							logger.info("json generated: " + jsonOutput);
+							
+							String message = ((ObjectNode) rootNode).get("message").toString();
+							message = message.substring(1, message.length()-1);
 							for (Object chatter : vertx.sharedData().getSet("chat.room." + chatRoom)) {
-								
-								
-								
 								String address = (String)chatter;
-								eventBus.send("test.address", jsonOutput + address);
-								
-								
-								
-								
-
-								
-								
+								eventBus.send("test.address", jsonOutput + address);								
+							}
+							if(message.charAt(0) == '/') {
+								if(message.contains(" "))
+									eventBus.send(message.substring(1, message.indexOf(" ")), message.substring(message.indexOf(" ")));
+								else
+									eventBus.send(message.substring(1), chatRoom);
 							}
 						} catch (IOException e) {
 							ws.reject();

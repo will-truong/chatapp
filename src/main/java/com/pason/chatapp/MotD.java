@@ -25,22 +25,47 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 //sends a message of the day every time a user connects
 public class MotD extends Verticle {
 	final String original = "sup man, the time is " + new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime()) + ". it's %CONDITION% and %TEMP% degrees right now";
+	final String noweather = "sup bro, the time is " + new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime()) + ". i'm still figuring out the weather, ask me later with /motd";
 	String motd = original;
+	boolean weatherReceived = false;
 
 	@Override
 	public void start() {
-		vertx.setPeriodic(1000, new Handler<Long>() {
+		weatherRequest();
+		vertx.setPeriodic(2000, new Handler<Long>() {
 			public void handle(Long event) {
 				weatherRequest();
+				if(weatherReceived) {
+					vertx.setPeriodic(30000l, new Handler<Long>() {
+						public void handle(Long event) {
+							weatherRequest();
+						}
+					});
+					vertx.cancelTimer(event);										
+				}					
 			}
 		});
-		vertx.eventBus().registerHandler("incoming.user", new Handler<Message>() {
+		Handler sendMotd = new Handler<Message>() {
 			@Override
 			public void handle(Message message) {
-				String chatter = message.body().toString();
-				vertx.eventBus().send(chatter, "{\"message\":\"" + motd + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}");				
+				String content = message.body().toString();
+				System.out.println(content);
+				String greeting = motd;
+				if(!weatherReceived)
+					greeting = noweather;
+				if(!vertx.sharedData().getSet("chat.room." + content).isEmpty()) {
+					for (Object chatter : vertx.sharedData().getSet("chat.room." + content)) {	
+						System.out.println("sending motd to " + (String)chatter);
+						String address = (String)chatter;
+						vertx.eventBus().send(address, "{\"message\":\"" + greeting + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}");								
+					}
+				}
+				else
+					vertx.eventBus().send(content, "{\"message\":\"" + greeting + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}");
 			}
-		});
+		};
+		vertx.eventBus().registerHandler("incoming.user", sendMotd);
+		vertx.eventBus().registerHandler("motd", sendMotd);
 	}
 	
 	public void weatherRequest() {
@@ -48,14 +73,17 @@ public class MotD extends Verticle {
 
 			@Override
 			public void handle(Message event) {
+				System.out.println("received weather data");
 				motd = original;
 				String html = (String) event.body();
 				String condition = html.split(",")[0];
 				String temp = html.split(",")[1];
 				motd = motd.replace("%CONDITION%", condition.toLowerCase());
 				motd = motd.replace("%TEMP%", temp);
+				weatherReceived = true;
 			}
 			
 		});
+		System.out.println("sent weather request");
 	}
 }
