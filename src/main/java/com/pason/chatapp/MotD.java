@@ -49,19 +49,19 @@ public class MotD extends Verticle {
 			@Override
 			public void handle(Message message) {
 				String content = message.body().toString();
-				System.out.println(content);
+//				System.out.println(content);
 				String greeting = motd;
 				if(!weatherReceived)
 					greeting = noweather;
 				if(!vertx.sharedData().getSet("chat.room." + content).isEmpty()) {
 					for (Object chatter : vertx.sharedData().getSet("chat.room." + content)) {	
-						System.out.println("sending motd to " + (String)chatter);
+//						System.out.println("sending motd to " + (String)chatter);
 						String address = (String)chatter;
-						vertx.eventBus().send(address, "{\"message\":\"" + greeting + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}");								
+						vertx.eventBus().send("finalsend", "{\"message\":\"" + greeting + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}" + address);								
 					}
 				}
 				else
-					vertx.eventBus().send(content, "{\"message\":\"" + greeting + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}");
+					vertx.eventBus().send("finalsend", "{\"message\":\"" + greeting + "\",\"sender\":\"MOTD\",\"received\":\"" + new Date().toString() + "\"}" + content);
 			}
 		};
 		vertx.eventBus().registerHandler("incoming.user", sendMotd);
@@ -73,7 +73,7 @@ public class MotD extends Verticle {
 
 			@Override
 			public void handle(Message event) {
-				System.out.println("received weather data");
+				//System.out.println("received weather data");
 				motd = original;
 				String html = (String) event.body();
 				String condition = html.split(",")[0];
@@ -84,6 +84,6 @@ public class MotD extends Verticle {
 			}
 			
 		});
-		System.out.println("sent weather request");
+		//System.out.println("sent weather request");
 	}
 }
