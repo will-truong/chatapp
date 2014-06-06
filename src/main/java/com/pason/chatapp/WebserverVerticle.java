@@ -87,18 +87,19 @@ public class WebserverVerticle extends Verticle {
 							((ObjectNode) rootNode).put("received", new Date().toString());
 							String jsonOutput = m.writeValueAsString(rootNode);
 							logger.info("json generated: " + jsonOutput);
-							
 							String message = ((ObjectNode) rootNode).get("message").toString();
 							message = message.substring(1, message.length()-1);
-							for (Object chatter : vertx.sharedData().getSet("chat.room." + chatRoom)) {
-								String address = (String)chatter;
-								eventBus.send("test.address", jsonOutput + address);								
-							}
-							if(message.charAt(0) == '/') {
-								if(message.contains(" "))
-									eventBus.send(message.substring(1, message.indexOf(" ")), message.substring(message.indexOf(" ")));
-								else
-									eventBus.send(message.substring(1), chatRoom);
+							if(message.length() > 0) {
+								for (Object chatter : vertx.sharedData().getSet("chat.room." + chatRoom)) {
+									String address = (String)chatter;
+									eventBus.send("test.address", jsonOutput + address);								
+								}
+								if(message.charAt(0) == '/') {
+									if(message.contains(" "))
+										eventBus.send(message.substring(1, message.indexOf(" ")), message.substring(message.indexOf(" ")));
+									else
+										eventBus.send(message.substring(1), chatRoom);
+								} 
 							}
 						} catch (IOException e) {
 							ws.reject();
