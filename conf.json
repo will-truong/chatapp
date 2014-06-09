@@ -1,5 +1,9 @@
-// Example JSON config file
-
 {
-  "foo": "bar"
+    "WebserverVerticleConfig": {
+    	"port":2014
+    },
+    "MotDConfig": {
+    },
+    "MessageFilterVerticleConfig": {
+    }
 }

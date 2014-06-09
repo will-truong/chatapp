@@ -14,6 +14,7 @@ import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.http.ServerWebSocket;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Verticle;
 
@@ -25,6 +26,9 @@ public class WebserverVerticle extends Verticle {
 	
 	@Override
 	public void start() {
+		System.out.println(container.config());
+		JsonObject config = container.config();
+		int port = config.getInteger("port");
 		final Pattern chatUrlPattern = Pattern.compile("/chat/(\\w+)");
 		final EventBus eventBus = vertx.eventBus();
 		final Logger logger = container.logger();
@@ -41,7 +45,7 @@ public class WebserverVerticle extends Verticle {
 			}
 		});
 
-		vertx.createHttpServer().requestHandler(httpRouteMatcher).listen(8080, "localhost");
+		vertx.createHttpServer().requestHandler(httpRouteMatcher).listen(port, "localhost");
 		
 		eventBus.registerHandler("finalsend", new Handler<Message<String>>() {
 		    public void handle(Message<String> message) {

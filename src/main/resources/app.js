@@ -1,8 +1,12 @@
 var vertx = require('vertx')
 var console = require('vertx/console')
 var container = require('vertx/container')
+var logger = container.logger;
+var config = container.config;
+
+logger.info(JSON.stringify(config));
 
 container.deployVerticle("accuweather.py");
 container.deployVerticle("com.pason.chatapp.MessageFilterVerticle");
-container.deployVerticle("com.pason.chatapp.WebserverVerticle");
+container.deployVerticle("com.pason.chatapp.WebserverVerticle", config.WebserverVerticleConfig);
 container.deployVerticle("com.pason.chatapp.MotD");

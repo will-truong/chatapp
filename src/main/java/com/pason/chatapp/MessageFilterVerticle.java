@@ -48,23 +48,17 @@ public class MessageFilterVerticle extends Verticle {
 		    	String [] words = check.split(" ");
 		    	Set<String> yes = new HashSet<String>(Arrays.asList(buzz));
 		    	String newmessage = "";
-		    	System.out.println("Made it past set");
 		    	
 		    	for(int x = 0; x < words.length; x++){
 		    		String buzzword = words[x];
-		    		System.out.println("In for loop, this is current word      " + buzzword);
 		    	if(yes.contains(buzzword)){
 		    		buzzword = "@$^&^@#";
-		    		System.out.println("it contains a bad word!");
 		    		
 		    	}
-		    	System.out.println("added to new message");
 		    	newmessage += buzzword + " ";
 		    }
-		    	System.out.println("Out of for loop");
 		    	((ObjectNode) rootNode).put("message", newmessage);
 				String jsonOutput = m.writeValueAsString(rootNode);
-				System.out.println("About to be sent");
 		    	vertx.eventBus().send(addresshold, jsonOutput); 
 		    	
 		    }
