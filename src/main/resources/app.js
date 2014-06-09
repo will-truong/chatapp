@@ -7,6 +7,6 @@ var config = container.config;
 logger.info(JSON.stringify(config));
 
 container.deployVerticle("accuweather.py");
-container.deployVerticle("com.pason.chatapp.MessageFilterVerticle");
+container.deployVerticle("com.pason.chatapp.MessageFilterVerticle",config.MessageFilterVerticleConfig);
 container.deployVerticle("com.pason.chatapp.WebserverVerticle", config.WebserverVerticleConfig);
 container.deployVerticle("com.pason.chatapp.MotD");

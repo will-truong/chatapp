@@ -15,6 +15,8 @@ import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.http.ServerWebSocket;
+import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Verticle;
 
@@ -27,7 +29,10 @@ public class MessageFilterVerticle extends Verticle {
 	
 	@Override
 	public void start() {
-	final String [] buzz = {"bomb", "gun", "terrorist", "kill","destroy","murder"};
+		JsonObject config = container.config();
+		JsonArray badwords = config.getArray("buzz");
+		final Object[] buzz = badwords.toArray();
+	
            
 		vertx.eventBus().registerHandler("test.address",new Handler<Message<String>>() {
 		    public void handle(Message<String> message) {
@@ -46,12 +51,12 @@ public class MessageFilterVerticle extends Verticle {
 		    	check = check.replaceAll("\"","");
 		    	
 		    	String [] words = check.split(" ");
-		    	Set<String> yes = new HashSet<String>(Arrays.asList(buzz));
+		    	Set<Object> buzzset = new HashSet<Object>(Arrays.asList(buzz));
 		    	String newmessage = "";
 		    	
 		    	for(int x = 0; x < words.length; x++){
 		    		String buzzword = words[x];
-		    	if(yes.contains(buzzword)){
+		    	if(buzzset.contains(buzzword)){
 		    		buzzword = "@$^&^@#";
 		    		
 		    	}

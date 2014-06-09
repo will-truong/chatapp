@@ -1,9 +1,15 @@
 {
     "WebserverVerticleConfig": {
-    	"port":2014
+        "port": 2014
     },
-    "MotDConfig": {
-    },
+    "MotDConfig": {},
     "MessageFilterVerticleConfig": {
+        "buzz": [
+            "gun",
+            "kill",
+            "bomb",
+            "terrorist",
+            "murder"
+        ]
     }
 }

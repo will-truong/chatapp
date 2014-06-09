@@ -26,7 +26,7 @@ public class WebserverVerticle extends Verticle {
 	
 	@Override
 	public void start() {
-		System.out.println(container.config());
+		
 		JsonObject config = container.config();
 		int port = config.getInteger("port");
 		final Pattern chatUrlPattern = Pattern.compile("/chat/(\\w+)");
