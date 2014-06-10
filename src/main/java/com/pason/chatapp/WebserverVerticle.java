@@ -5,14 +5,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.junit.Assume;
+import org.junit.Test;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.EventBus;
+import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.http.ServerWebSocket;
@@ -28,14 +32,29 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class WebserverVerticle extends Verticle {
 	
 	@Override
-	public void start() {		
-		JsonObject config = container.config();
+	public void start() {
 		final Pattern chatUrlPattern = Pattern.compile("/chat/(\\w+)/(\\w+)");
+		
+		JsonObject config = container.config();
+		HashMap<String, Object> configMap = (HashMap<String, Object>) config.toMap();
+		Integer port = null;
+		if(!(configMap.get("port") instanceof Integer)) {
+			System.out.println("no integer port, using 2014");
+			port = 2014;
+		}
+		else {
+			port = (Integer)configMap.get("port");
+			System.out.println("port suggested: " + port);
+		}
+		if(port <= 0) {
+			System.out.println("invalid integer port, using 2014");
+			port = 2014;
+		}
+		
 		final EventBus eventBus = vertx.eventBus();
 		final Logger logger = container.logger();
 		ConcurrentSharedMap<Object, Object> idNameMap = vertx.sharedData().getMap("id-name");
 		ConcurrentSharedMap<Object, Object> nameIdMap = vertx.sharedData().getMap("name-id"); 
-		
 		
 		RouteMatcher httpRouteMatcher = new RouteMatcher().get("/", new Handler<HttpServerRequest>() {
 			@Override
@@ -48,9 +67,9 @@ public class WebserverVerticle extends Verticle {
 				request.response().sendFile("web/" + new File(request.path()));
 			}
 		});
-
-		vertx.createHttpServer().requestHandler(httpRouteMatcher).listen(config.getInteger("port"), "localhost");
 		
+		vertx.createHttpServer().requestHandler(httpRouteMatcher).listen(port, "localhost");
+
 		eventBus.registerHandler("finalsend", new Handler<Message<String>>() {
 		    public void handle(Message<String> message) {
 		    	
