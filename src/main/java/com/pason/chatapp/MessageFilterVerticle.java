@@ -29,47 +29,28 @@ public class MessageFilterVerticle extends Verticle {
 	
 	@Override
 	public void start() {
-		JsonObject config = container.config();
-		JsonArray badwords = config.getArray("buzz");
-		final Object[] buzz = badwords.toArray();
+		JsonArray badwords = container.config().getArray("buzz");
+		final List buzz =  badwords.toList();
 	
            
 		vertx.eventBus().registerHandler("test.address",new Handler<Message<String>>() {
 		    public void handle(Message<String> message) {
 		    	message.reply();
-		    	ObjectMapper m = new ObjectMapper();
-		    	String data = message.body();
-		    	int index = data.lastIndexOf("}");
-		    	String addresshold = data.substring(index + 1);
-		    	data = data.substring(0, index + 1);
-		    	try{
-		    		
-		    	JsonNode rootNode = m.readTree(data.toString());
+		    	JsonObject obj =  new JsonObject(message.body());
+			     
+			        MessageFilter filter = new MessageFilterRegular();
+			        String message1 = obj.getString("message");
+			       
+			        String filteredMess = filter.filterMessage(buzz, message1);
+			        
+			    	obj.putString("message",filteredMess);
+			    	 
+			    	String address = obj.getString("address");
+			    	 
+			    	obj.removeField("address");
+			    	 
+			    	vertx.eventBus().send(address,obj.toString());
 		    	
-		    	String check = ((ObjectNode)rootNode).get("message").toString();
-		    	
-		    	check = check.replaceAll("\"","");
-		    	
-		    	String [] words = check.split(" ");
-		    	Set<Object> buzzset = new HashSet<Object>(Arrays.asList(buzz));
-		    	String newmessage = "";
-		    	
-		    	for(int x = 0; x < words.length; x++){
-		    		String buzzword = words[x];
-		    	if(buzzset.contains(buzzword)){
-		    		buzzword = "@$^&^@#";
-		    		
-		    	}
-		    	newmessage += buzzword + " ";
-		    }
-		    	((ObjectNode) rootNode).put("message", newmessage);
-				String jsonOutput = m.writeValueAsString(rootNode);
-		    	vertx.eventBus().send(addresshold, jsonOutput); 
-		    	
-		    }
-		    	catch(IOException e){
-		    		System.err.println("Uh Oh");
-		    	}
 		    	
 		    }
 		});

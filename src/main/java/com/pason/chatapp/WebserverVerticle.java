@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Assume;
-import org.junit.Test;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
