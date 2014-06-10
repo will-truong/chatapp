@@ -101,7 +101,7 @@ public class WebserverVerticle extends Verticle {
 							logger.info("json generated: " + jsonOutput);
 							final String backupjson =  jsonOutput;
 							String message = ((ObjectNode) rootNode).get("message").asText();
-							JsonObject user = new JsonObject().putString("id", (String) vertx.sharedData().getMap(chatRoom + ".name-id").get(rootNode.get("sender"))).putString("name", rootNode.get("sender").asText()).putString("chatroom", chatRoom);
+							JsonObject user = new JsonObject().putString("id", (String) vertx.sharedData().getMap(chatRoom + ".name-id").get(rootNode.get("sender").asText())).putString("name", rootNode.get("sender").asText()).putString("chatroom", chatRoom);
 							if(message.length() > 0) {
 								if(message.charAt(0) == '/') {
 									if(message.contains(" "))
