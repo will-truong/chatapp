@@ -55,15 +55,15 @@ public class MotD extends Verticle {
 			@Override
 			public void handle(Message message) {
 				String content = message.body().toString();
-				JsonObject map = (JsonObject)message.body();
-				String id = map.getString("id");
+				JsonObject map = new JsonObject();
+				System.out.println(message.body() + "       message body from motd");
 				String name = map.getString("name");
 				String greeting = motd;
 				if(!weatherReceived)
 					greeting = motdNoWeather;
 				greeting = greeting.replace("%time%", new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime())).replace("%name%", name);
 				JsonObject motdMessage = new JsonObject().putString("message", greeting).putString("sender", "motd").putString("received", new Date().toString());
-				vertx.eventBus().send("test.address", motdMessage.toString() + id);
+				vertx.eventBus().send("test.address", motdMessage.toString());
 			}
 		};
 		vertx.eventBus().registerHandler("incoming.user", sendMotd);
