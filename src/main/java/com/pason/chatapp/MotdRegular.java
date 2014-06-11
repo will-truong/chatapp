@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 
 public class MotdRegular implements Motd {
-	boolean weatherReceived = false;
+	public boolean weatherReceived = false;
 	String motdOriginalWeather = "Hi, no message of the day set.";
 	String motdNoWeather = "Hi, no message of the day set.";
 	HashMap<String, Object> variables = new HashMap<>();

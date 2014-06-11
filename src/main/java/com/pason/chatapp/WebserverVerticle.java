@@ -2,10 +2,8 @@ package com.pason.chatapp;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,13 +12,11 @@ import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.EventBus;
-import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.http.ServerWebSocket;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.shareddata.ConcurrentSharedMap;
 import org.vertx.java.platform.Verticle;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -51,8 +47,6 @@ public class WebserverVerticle extends Verticle {
 		
 		final EventBus eventBus = vertx.eventBus();
 		final Logger logger = container.logger();
-		ConcurrentSharedMap<Object, Object> idNameMap = vertx.sharedData().getMap("id-name");
-		ConcurrentSharedMap<Object, Object> nameIdMap = vertx.sharedData().getMap("name-id"); 
 		
 		RouteMatcher httpRouteMatcher = new RouteMatcher().get("/", new Handler<HttpServerRequest>() {
 			@Override
@@ -131,7 +125,8 @@ public class WebserverVerticle extends Verticle {
 										    public void handle(AsyncResult<Message<String>> result) {
 										        if (result.succeeded()) {
 										           
-										        } else {									        	
+										        } else {	
+										        	System.out.println("sending backup msg");
 		                                                   vertx.eventBus().send(address, obj.toString());									            
 										        }
 										    }

@@ -1,7 +1,5 @@
 package com.pason.chatapp;
 
-import com.pason.chatapp.Motd;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,10 +18,10 @@ public class MotdVerticle extends Verticle {
 
 	@Override
 	public void start() {
-		motd.setMotd((String)((HashMap) container.config().toMap()).get("motd"), (String)((HashMap) container.config().toMap()).get("motdNoWeather"));
+		motd.setMotd((String)((HashMap<String, Object>) container.config().toMap()).get("motd"), (String)((HashMap<String, Object>) container.config().toMap()).get("motdNoWeather"));
 		
 		weatherRequest();
-		vertx.setPeriodic(2000, new Handler<Long>() {
+		vertx.setPeriodic(4000, new Handler<Long>() {
 			public void handle(Long event) {
 				weatherRequest();
 				if(motd.weatherReceived) {
@@ -36,13 +34,11 @@ public class MotdVerticle extends Verticle {
 				}					
 			}
 		});
-		Handler<Message> sendMotd = new Handler<Message>() {
+		Handler<Message<JsonObject>> sendMotd = new Handler<Message<JsonObject>>() {
 			@Override
-			public void handle(Message message) {
-				String content = message.body().toString();
+			public void handle(Message<JsonObject> message) {
 				JsonObject jsonMap = (JsonObject)message.body();
-				String time = (new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime())).toString();
-				HashMap<String, Object> changes = new HashMap<>();
+				HashMap<String, Object> changes = new HashMap<String, Object>();
 				changes.put("id", jsonMap.getString("id"));
 				changes.put("name", jsonMap.getString("name"));
 				changes.put("time", (new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime())).toString());
@@ -57,11 +53,11 @@ public class MotdVerticle extends Verticle {
 	}
 	
 	public void weatherRequest() { //requests accuweather.py for weather information, handler edits motd appropriately
-		vertx.eventBus().send("request.weather", "", new Handler<Message>() {
+		vertx.eventBus().send("request.weather", "", new Handler<Message<String>>() {
 
 			@Override
-			public void handle(Message event) { //on successful motd editing, motd = true, and condition, temp replaced appropriately
-				HashMap<String, Object> changes = new HashMap<>();
+			public void handle(Message<String> event) { //on successful motd editing, motd = true, and condition, temp replaced appropriately
+				HashMap<String, Object> changes = new HashMap<String, Object>();
 				changes.put("temp", ((String) event.body()).split(",")[1]);
 				changes.put("condition", (((String) event.body()).split(",")[0]).toLowerCase());
 				motd.updateMotd(changes);

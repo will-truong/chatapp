@@ -1,9 +1,5 @@
 package com.pason.chatapp;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 public interface Motd {
 	boolean weatherReceived = false;
