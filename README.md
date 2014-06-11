@@ -1,5 +1,7 @@
 ChatApp
 
-Run chatapp-1.0-fat.jar (by double clicking or "java -jar chatapp-1.0-fat.jar")
+Run chatapp-1.0-fat.jar, preferably  with the conf.json file loaded 
+(java -jar chatapp-1.0-fat.jar -conf conf.json)
 
-Go to http://localhost:8080
+Go to http://localhost:2014
+(Port is configurable, default is 2014)
