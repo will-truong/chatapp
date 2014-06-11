@@ -12,7 +12,7 @@ import org.junit.Test;
 public class MotDTest {
 
 	@Test
-	public void testWeatherRequest() {
+	public void testEverything() {
 		MotdRegular vert1 = new MotdRegular();
 		assertEquals("Hi, no message of the day set.", vert1.getMotd()); //this should be the motd by default
 		vert1.setMotd("1: %name% %time% %cond% %temp%", "2: %name% %time%"); //sets motd's with vars (1st motd w/ weather info, 2nd motd w/o weather info)
