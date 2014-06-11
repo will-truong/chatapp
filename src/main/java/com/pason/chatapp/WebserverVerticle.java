@@ -68,15 +68,7 @@ public class WebserverVerticle extends Verticle {
 		
 		vertx.createHttpServer().requestHandler(httpRouteMatcher).listen(port, "localhost");
 
-		eventBus.registerHandler("finalsend", new Handler<Message<String>>() {
-		    public void handle(Message<String> message) {
-		    	
-		    	int index = message.body().lastIndexOf("}");		    	
-		    	String address = message.body().substring(index + 1);
-		    	String data = message.body().substring(0, index + 1);
-		    	eventBus.send(address, data);
-		    }
-		});
+		
 
 		vertx.createHttpServer().websocketHandler(new Handler<ServerWebSocket>() {
 			@Override
@@ -114,9 +106,14 @@ public class WebserverVerticle extends Verticle {
 						try {
 							JsonNode rootNode = m.readTree(data.toString());
 							((ObjectNode) rootNode).put("received", new Date().toString());
-							String jsonOutput = m.writeValueAsString(rootNode);
-							logger.info("json generated: " + jsonOutput);
-							final String backupjson =  jsonOutput;
+
+							final JsonObject obj = new JsonObject().putString("message", ((ObjectNode) rootNode).get("message")
+							.toString().replaceAll("\"", "")).putString("sender", ((ObjectNode) rootNode).get("sender").toString().replaceAll("\"", ""))
+							.putString("received", ((ObjectNode) rootNode).get("received").toString().replaceAll("\"", ""));
+							
+							
+							logger.info("json generated: " + obj.toString());
+							
 							String message = ((ObjectNode) rootNode).get("message").asText();
 							JsonObject user = new JsonObject().putString("id", (String) vertx.sharedData().getMap(chatRoom + ".name-id").get(rootNode.get("sender").asText())).putString("name", rootNode.get("sender").asText()).putString("chatroom", chatRoom);
 							if(message.length() > 0) {
@@ -129,12 +126,13 @@ public class WebserverVerticle extends Verticle {
 								else {
 									for (Object chatter : vertx.sharedData().getSet("chat.room." + chatRoom)) {
 										final String address = (String)chatter;
-										vertx.eventBus().sendWithTimeout("test.address", jsonOutput + address,20,new Handler<AsyncResult<Message<String>>>() {
+										obj.putString("address", address);
+										vertx.eventBus().sendWithTimeout("test.address", obj.toString(),20,new Handler<AsyncResult<Message<String>>>() {
 										    public void handle(AsyncResult<Message<String>> result) {
 										        if (result.succeeded()) {
 										           
 										        } else {									        	
-		                                                   vertx.eventBus().send(address, backupjson);									            
+		                                                   vertx.eventBus().send(address, obj.toString());									            
 										        }
 										    }
 										});										
