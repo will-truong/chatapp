@@ -127,7 +127,7 @@ public class WebserverVerticle extends Verticle {
 									for (Object chatter : vertx.sharedData().getSet("chat.room." + chatRoom)) {
 										final String address = (String)chatter;
 										obj.putString("address", address);
-										vertx.eventBus().sendWithTimeout("test.address", obj.toString(),20,new Handler<AsyncResult<Message<String>>>() {
+										vertx.eventBus().sendWithTimeout("test.address", obj.toString(),100,new Handler<AsyncResult<Message<String>>>() {
 										    public void handle(AsyncResult<Message<String>> result) {
 										        if (result.succeeded()) {
 										           
