@@ -24,7 +24,7 @@ public class MotdVerticle extends Verticle {
 		vertx.setPeriodic(4000, new Handler<Long>() {
 			public void handle(Long event) {
 				weatherRequest();
-				if(motd.weatherReceived) {
+				if(motd.isWeatherReceived()) {
 					vertx.setPeriodic(30000l, new Handler<Long>() {
 						public void handle(Long event) {
 							weatherRequest();
@@ -59,7 +59,7 @@ public class MotdVerticle extends Verticle {
 			public void handle(Message<String> event) { //on successful motd editing, motd = true, and condition, temp replaced appropriately
 				HashMap<String, Object> changes = new HashMap<String, Object>();
 				changes.put("temp", ((String) event.body()).split(",")[1]);
-				changes.put("condition", (((String) event.body()).split(",")[0]).toLowerCase());
+				changes.put("cond", (((String) event.body()).split(",")[0]).toLowerCase());
 				motd.updateMotd(changes);
 			}
 		});
