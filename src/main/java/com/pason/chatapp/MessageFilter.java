@@ -13,10 +13,6 @@ class MessageFilterRegular implements MessageFilter {
 
 	@Override
 	public String filterMessage(List<String> badwords, String data) {
-		
-    	
-    	
-    	data = data.replaceAll("\"", "");
     	String [] words = data.split(" ");
     	String newmessage = "";
     		

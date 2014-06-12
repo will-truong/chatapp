@@ -98,12 +98,21 @@ public class WebserverVerticle extends Verticle {
 					public void handle(final Buffer data) {
 						ObjectMapper m = new ObjectMapper();
 						try {
-							JsonNode rootNode = m.readTree(data.toString());
+							String dataStr = data.toString();
+//							String pat = "\\{\"message\":\"(.+)\", \"sender\":\".+?"; also works but use matches() instead of find() and use group(1) instead of group(), also change the replaceFirst to sth else. keep in case this one is actually better than pat2
+							String pat2 = "(?<=\\{\"message\":\").+(?=\", \"sender\":\".+?)";
+							Pattern msgPattern = Pattern.compile(pat2);
+							Matcher matcher = msgPattern.matcher(dataStr);
+							matcher.find();
+							String msgstr = matcher.group();
+							dataStr = dataStr.replaceFirst(pat2, "");
+							JsonNode rootNode = m.readTree(dataStr);
 							((ObjectNode) rootNode).put("received", new Date().toString());
+							((ObjectNode) rootNode).put("message", msgstr);
 
 							final JsonObject obj = new JsonObject().putString("message", ((ObjectNode) rootNode).get("message")
-							.toString().replaceAll("\"", "")).putString("sender", ((ObjectNode) rootNode).get("sender").toString().replaceAll("\"", ""))
-							.putString("received", ((ObjectNode) rootNode).get("received").toString().replaceAll("\"", ""));
+							.asText()).putString("sender", ((ObjectNode) rootNode).get("sender").asText())
+							.putString("received", ((ObjectNode) rootNode).get("received").asText());
 							
 							
 							logger.info("json generated: " + obj.toString());
@@ -135,7 +144,7 @@ public class WebserverVerticle extends Verticle {
 								}
 							}
 						} catch (IOException e) {
-							ws.reject();
+//							ws.reject();
 						}
 					}
 				});
