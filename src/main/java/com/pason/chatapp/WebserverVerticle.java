@@ -99,14 +99,16 @@ public class WebserverVerticle extends Verticle {
 						ObjectMapper m = new ObjectMapper();
 						try {
 							String dataStr = data.toString();
-							Pattern msgPattern = Pattern.compile("\\{\"message\":\"(.+)\", \"sender\":\".+");
+//							String pat = "\\{\"message\":\"(.+)\", \"sender\":\".+?"; also works but use matches() instead of find() and use group(1) instead of group(), also change the replaceFirst to sth else. keep in case this one is actually better than pat2
+							String pat2 = "(?<=\\{\"message\":\").+(?=\", \"sender\":\".+?)";
+							Pattern msgPattern = Pattern.compile(pat2);
 							Matcher matcher = msgPattern.matcher(dataStr);
-							matcher.matches();
-							String msgstr = matcher.group(1);
-							String nmsgstr = msgstr.replace("\"", "\\\"");
-							dataStr = dataStr.replace(msgstr.subSequence(0, msgstr.length()), nmsgstr);
+							matcher.find();
+							String msgstr = matcher.group();
+							dataStr = dataStr.replaceFirst(pat2, "");
 							JsonNode rootNode = m.readTree(dataStr);
 							((ObjectNode) rootNode).put("received", new Date().toString());
+							((ObjectNode) rootNode).put("message", msgstr);
 
 							final JsonObject obj = new JsonObject().putString("message", ((ObjectNode) rootNode).get("message")
 							.asText()).putString("sender", ((ObjectNode) rootNode).get("sender").asText())
@@ -142,7 +144,7 @@ public class WebserverVerticle extends Verticle {
 								}
 							}
 						} catch (IOException e) {
-							ws.reject();
+//							ws.reject();
 						}
 					}
 				});
