@@ -19,9 +19,8 @@ public class MotdRegular implements Motd {
 	
 	@Override
 	public void updateMotd(HashMap<String, Object> updates) { //updates the motd with a provided mapping and checks if theres weather info
-		for(String field : updates.keySet()) {
-			variables.put(field, updates.get(field));
-		}
+		if(updates != null)
+			variables.putAll(updates);
 		weatherReceived = variables.get("cond") != null && variables.get("temp") != null;
 	}
 	
@@ -29,7 +28,7 @@ public class MotdRegular implements Motd {
 	public void setMotd(String weather, String noWeather) { //sets the motd's
 		if(weather != null)
 			motdOriginalWeather = weather;
-		if(motdNoWeather != null)
+		if(noWeather != null)
 			motdNoWeather = noWeather;
 	}
 
