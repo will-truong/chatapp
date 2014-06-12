@@ -44,7 +44,7 @@ public class MotdVerticle extends Verticle {
 				changes.put("time", (new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime())).toString());
 				motd.updateMotd(changes);
 				String greeting = motd.getMotd();
-				JsonObject motdMessage = new JsonObject().putString("message", greeting).putString("sender", "motd").putString("received", new Date().toString());
+				JsonObject motdMessage = new JsonObject().putString("message", greeting).putString("sender", "SYSTEM").putString("received", new Date().toString());
 				vertx.eventBus().send(jsonMap.getString("id"), motdMessage.toString());
 			}
 		};

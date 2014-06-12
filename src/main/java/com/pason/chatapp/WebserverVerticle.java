@@ -122,7 +122,7 @@ public class WebserverVerticle extends Verticle {
 							if(message.length() > 0) {
 								if(message.charAt(0) == '/') {
 									if(message.contains(" "))
-										eventBus.send(message.substring(1, message.indexOf(" ")), user.putString("parameters", message.substring(message.indexOf(" "))));
+										eventBus.send(message.substring(1, message.indexOf(" ")), user.putString("parameters", message.substring(message.indexOf(" ") + 1)));
 									else
 										eventBus.send(message.substring(1), user);
 								}

@@ -119,7 +119,7 @@ body {
 		$('#enterRoom').click(function(evt) {
 			evt.preventDefault();
 			connectToChatserver();
-			$('.chat-wrapper h2').text('Chat # '+$nickName.val() + "@" + room);
+			$('.chat-wrapper h2').text("#" + room + "/" + $nickName.val());
 			$('.chat-signin').hide();
 			$('.chat-wrapper').show();
 			$message.focus();
