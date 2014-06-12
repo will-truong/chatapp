@@ -98,12 +98,19 @@ public class WebserverVerticle extends Verticle {
 					public void handle(final Buffer data) {
 						ObjectMapper m = new ObjectMapper();
 						try {
-							JsonNode rootNode = m.readTree(data.toString());
+							String dataStr = data.toString();
+							Pattern msgPattern = Pattern.compile("\\{\"message\":\"(.+)\", \"sender\":\".+");
+							Matcher matcher = msgPattern.matcher(dataStr);
+							matcher.matches();
+							String msgstr = matcher.group(1);
+							String nmsgstr = msgstr.replace("\"", "\\\"");
+							dataStr = dataStr.replace(msgstr.subSequence(0, msgstr.length()), nmsgstr);
+							JsonNode rootNode = m.readTree(dataStr);
 							((ObjectNode) rootNode).put("received", new Date().toString());
 
 							final JsonObject obj = new JsonObject().putString("message", ((ObjectNode) rootNode).get("message")
-							.toString().replaceAll("\"", "")).putString("sender", ((ObjectNode) rootNode).get("sender").toString().replaceAll("\"", ""))
-							.putString("received", ((ObjectNode) rootNode).get("received").toString().replaceAll("\"", ""));
+							.asText()).putString("sender", ((ObjectNode) rootNode).get("sender").asText())
+							.putString("received", ((ObjectNode) rootNode).get("received").asText());
 							
 							
 							logger.info("json generated: " + obj.toString());
