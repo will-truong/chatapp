@@ -7,6 +7,7 @@ public interface MessageFilter
 public String filterMessage(List<String> badwords, String data);
 
 
+
 }
 
 class MessageFilterRegular implements MessageFilter {
@@ -28,9 +29,7 @@ class MessageFilterRegular implements MessageFilter {
     }
     	
     	
-    	
-    	
-		return newmessage;
+    	return newmessage;
     	
     	
    

@@ -19,19 +19,26 @@ public class MessageFilterVerticle extends Verticle {
            
 		vertx.eventBus().registerHandler("test.address",new Handler<Message<String>>() {
 		    public void handle(Message<String> message) {
-		    	message.reply();
-		    	JsonObject obj =  new JsonObject(message.body());
+		    	    message.reply();
+		    	    int badWordCount = 0;
+		    	    JsonObject obj =  new JsonObject(message.body());
 			     
 			        MessageFilter filter = new MessageFilterRegular();
 			        String message1 = obj.getString("message");
 			       
 			        String filteredMess = filter.filterMessage(buzz, message1);
 			        
+			        
 			    	obj.putString("message",filteredMess);
 			    	 
 			    	String address = obj.getString("address");
 			    	 
 			    	obj.removeField("address");
+			    	
+			    	if(!filteredMess.equals(message1)){
+			        	badWordCount++;
+			        	
+			        }
 			    	 
 			    	vertx.eventBus().send(address,obj.toString());
 		    	

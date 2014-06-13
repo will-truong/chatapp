@@ -77,6 +77,7 @@ public class WebserverVerticle extends Verticle {
 				final String name = m.group(2);
 				final String id = ws.textHandlerID();
 				
+				System.out.println("chatroom   " + chatRoom + "   name   " + name + "    id     " + id);
 				
 				logger.info("registering name: " + name + " with id: " + id + " for chat-room: " + chatRoom);
 				vertx.sharedData().getSet("chat.room." + chatRoom).add(id);
@@ -88,6 +89,7 @@ public class WebserverVerticle extends Verticle {
 				newUser.putString("message", entry);
 				newUser.putString("sender", "SYSTEM");
 				newUser.putString("received", new Date().toString());
+				System.out.println("Here we are)");
 				for(Object address : vertx.sharedData().getMap(chatRoom + "." + "id-name").keySet())
 					vertx.eventBus().send((String) address, newUser.toString());
 
