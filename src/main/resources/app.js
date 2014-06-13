@@ -10,5 +10,6 @@ container.deployVerticle("accuweather.py");
 container.deployVerticle("com.pason.chatapp.MotdVerticle", config.MotdConfig);
 container.deployVerticle("com.pason.chatapp.PmVerticle");
 container.deployVerticle("com.pason.chatapp.MeVerticle");
+container.deployVerticle("com.pason.chatapp.ListVerticle");
 container.deployVerticle("com.pason.chatapp.MessageFilterVerticle",config.MessageFilterVerticleConfig);
 container.deployVerticle("com.pason.chatapp.WebserverVerticle", config.WebserverVerticleConfig);

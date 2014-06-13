@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -81,6 +82,14 @@ public class WebserverVerticle extends Verticle {
 				vertx.sharedData().getSet("chat.room." + chatRoom).add(id);
 				vertx.sharedData().getMap(chatRoom + ".name-id").put(name, id);
 				vertx.sharedData().getMap(chatRoom + ".id-name").put(id, name);
+				
+				JsonObject newUser = new JsonObject();
+				String entry = name + " has joined the channel.";
+				newUser.putString("message", entry);
+				newUser.putString("sender", "SYSTEM");
+				newUser.putString("received", new Date().toString());
+				for(Object address : vertx.sharedData().getMap(chatRoom + "." + "id-name").keySet())
+					vertx.eventBus().send((String) address, newUser.toString());
 
 
 				eventBus.send("incoming.user", new JsonObject().putString("id", id).putString("name", name).putString("chatroom", chatRoom));
