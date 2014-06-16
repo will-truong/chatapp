@@ -1,0 +1,19 @@
+{
+    "WebserverVerticleConfig": {
+    	"port":2014
+    },
+    "MotdConfig": {
+    	"_comment": "%cond% for weather conditions, %temp% for temperature in fahrenheit, %time% for current time (hh:mm a), %name% for name", 	
+    	"motd": "Hey %name%, it's %time%. Looks like it's %cond% and %temp% degrees",
+    	"motdNoWeather": "Hey %name%, it's %time%, and I'm getting the weather -- ask again soon with /motd"
+    },
+    "MessageFilterVerticleConfig": {
+        "buzz": [
+            "gun",
+            "kill",
+            "bomb",
+            "terrorist",
+            "murder"
+        ]
+    }
+}

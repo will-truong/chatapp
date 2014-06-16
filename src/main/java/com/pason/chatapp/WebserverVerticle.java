@@ -3,8 +3,7 @@ package com.pason.chatapp;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashMap;			
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -147,6 +146,7 @@ public class WebserverVerticle extends Verticle {
 							JsonObject user = new JsonObject().putString("id", (String) vertx.sharedData().getMap(chatRoom + ".name-id").get(rootNode.get("sender").asText())).putString("name", rootNode.get("sender").asText()).putString("chatroom", chatRoom);
 							if(message.length() > 0) {
 								if(message.charAt(0) == '/') {
+									eventBus.send(user.getString("id"), obj.toString());
 									if(message.contains(" "))
 										eventBus.send(message.substring(1, message.indexOf(" ")), user.putString("parameters", message.substring(message.indexOf(" ") + 1)));
 									else
@@ -172,11 +172,15 @@ public class WebserverVerticle extends Verticle {
 							}
                              }
 						} catch (IOException e) {
+<<<<<<< HEAD
 							System.err.println("messed up");
 							ws.reject();
 
 
 
+=======
+							ws.reject();
+>>>>>>> fa1ae5b1940c06288ac5272b20049bbb488ac9b4
 						}
 						
 					}
