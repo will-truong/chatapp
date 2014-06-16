@@ -28,6 +28,7 @@ public class WebserverVerticle extends Verticle {
 	
 	@Override
 	public void start() {
+
 		final Pattern chatUrlPattern = Pattern.compile("/chat/(\\w+)/(\\w+)");
 		
 		JsonObject config = container.config();
@@ -77,29 +78,30 @@ public class WebserverVerticle extends Verticle {
 				final String name = m.group(2);
 				final String id = ws.textHandlerID();
 				
-				System.out.println("chatroom   " + chatRoom + "   name   " + name + "    id     " + id);
 				
 				logger.info("registering name: " + name + " with id: " + id + " for chat-room: " + chatRoom);
 				vertx.sharedData().getSet("chat.room." + chatRoom).add(id);
 				vertx.sharedData().getMap(chatRoom + ".name-id").put(name, id);
 				vertx.sharedData().getMap(chatRoom + ".id-name").put(id, name);
 				
-				JsonObject newUser = new JsonObject();
+				final JsonObject newUser = new JsonObject();
 				String entry = name + " has joined the channel.";
 				newUser.putString("message", entry);
 				newUser.putString("sender", "SYSTEM");
 				newUser.putString("received", new Date().toString());
-				System.out.println("Here we are)");
 				for(Object address : vertx.sharedData().getMap(chatRoom + "." + "id-name").keySet())
 					vertx.eventBus().send((String) address, newUser.toString());
 
 
 				eventBus.send("incoming.user", new JsonObject().putString("id", id).putString("name", name).putString("chatroom", chatRoom));
 
+				 
+				
 				ws.closeHandler(new Handler<Void>() {
 					@Override
 					public void handle(final Void event) {
 						logger.info("un-registering connection with id: " + id + " from chat-room: " + chatRoom);
+						
 						vertx.sharedData().getSet("chat.room." + chatRoom).remove(id);
 					}
 				});
@@ -107,26 +109,39 @@ public class WebserverVerticle extends Verticle {
 				ws.dataHandler(new Handler<Buffer>() {
 					@Override
 					public void handle(final Buffer data) {
+						
+						
 						ObjectMapper m = new ObjectMapper();
 						try {
 							String dataStr = data.toString();
-//							String pat = "\\{\"message\":\"(.+)\", \"sender\":\".+?"; also works but use matches() instead of find() and use group(1) instead of group(), also change the replaceFirst to sth else. keep in case this one is actually better than pat2
-							String pat2 = "(?<=\\{\"message\":\").+(?=\", \"sender\":\".+?)";
+
+							// String pat = "\\{\"message\":\"(.+)\", \"sender\":\".+?"; also works but use matches() instead of find() and use group(1) instead of group(), also change the replaceFirst to sth else. keep in case this one is actually better than pat2
+                            String pat2 = "(?<=\\{\"message\":\").+(?=\", \"sender\":\".+?)";
 							Pattern msgPattern = Pattern.compile(pat2);
 							Matcher matcher = msgPattern.matcher(dataStr);
 							matcher.find();
 							String msgstr = matcher.group();
 							dataStr = dataStr.replaceFirst(pat2, "");
+
 							JsonNode rootNode = m.readTree(dataStr);
 							((ObjectNode) rootNode).put("received", new Date().toString());
 							((ObjectNode) rootNode).put("message", msgstr);
 
+
+                             if(!vertx.sharedData().getMap(chatRoom + ".name-id").containsKey(((ObjectNode) rootNode).get("sender").toString().replaceAll("\"", ""))){
+                            	 
+                             }
+                             else{
+
+
 							final JsonObject obj = new JsonObject().putString("message", ((ObjectNode) rootNode).get("message")
 							.asText()).putString("sender", ((ObjectNode) rootNode).get("sender").asText())
 							.putString("received", ((ObjectNode) rootNode).get("received").asText());
-							
-							
+
 							logger.info("json generated: " + obj.toString());
+						
+							
+						
 							
 							String message = ((ObjectNode) rootNode).get("message").asText();
 							JsonObject user = new JsonObject().putString("id", (String) vertx.sharedData().getMap(chatRoom + ".name-id").get(rootNode.get("sender").asText())).putString("name", rootNode.get("sender").asText()).putString("chatroom", chatRoom);
@@ -139,10 +154,11 @@ public class WebserverVerticle extends Verticle {
 								}
 								else {
 									for (Object chatter : vertx.sharedData().getSet("chat.room." + chatRoom)) {
+										
 										final String address = (String)chatter;
 										obj.putString("address", address);
-										vertx.eventBus().sendWithTimeout("test.address", obj.toString(),100,new Handler<AsyncResult<Message<String>>>() {
-										    public void handle(AsyncResult<Message<String>> result) {
+										vertx.eventBus().sendWithTimeout("test.address", obj.toString(),700,new Handler<AsyncResult<Message<Byte>>>() {
+										    public void handle(AsyncResult<Message<Byte>> result) {
 										        if (result.succeeded()) {
 										           
 										        } else {	
@@ -154,11 +170,38 @@ public class WebserverVerticle extends Verticle {
 									}
 								}
 							}
+                             }
 						} catch (IOException e) {
-//							ws.reject();
+							System.err.println("messed up");
+							ws.reject();
+
+
+
 						}
+						
 					}
 				});
+				vertx.eventBus().registerHandler("notifier.address",new Handler<Message<String>>() {
+		  		    public void handle(Message<String> message) {
+		  		    	JsonObject obj = new JsonObject(message.body());
+		  		    	
+		  		    	
+                             
+                             
+		  		    		if(obj.getInteger("badCount") == 1){
+		  		    			newUser.putString("message", "You have just typed an unapproved word. One more violation and you will no longer be allowed to talk.");
+		  		    			vertx.eventBus().send(vertx.sharedData().getMap(chatRoom + ".name-id").get(obj.getString("name")).toString(), newUser.toString());
+		  		    		}
+		  		    		else{
+		  		    			newUser.putString("message", "That's it. I warned you, you are done.");
+		  		    			vertx.eventBus().send(vertx.sharedData().getMap(chatRoom + ".name-id").get(obj.getString("name")).toString(), newUser.toString());
+		  		    			vertx.sharedData().getMap(chatRoom + ".name-id").remove(obj.getString("name"));
+		  		    			vertx.sharedData().getSet("chat.room." + chatRoom).remove(vertx.sharedData().getMap(chatRoom + ".name-id").get(obj.getString("name")).toString());
+		  		    		}
+		  		    	
+		  		    }
+		  		    
+			 });    
 
 			}
 		}).listen(8090);
