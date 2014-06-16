@@ -129,6 +129,7 @@ public class WebserverVerticle extends Verticle {
 							JsonObject user = new JsonObject().putString("id", (String) vertx.sharedData().getMap(chatRoom + ".name-id").get(rootNode.get("sender").asText())).putString("name", rootNode.get("sender").asText()).putString("chatroom", chatRoom);
 							if(message.length() > 0) {
 								if(message.charAt(0) == '/') {
+									eventBus.send(user.getString("id"), obj.toString());
 									if(message.contains(" "))
 										eventBus.send(message.substring(1, message.indexOf(" ")), user.putString("parameters", message.substring(message.indexOf(" ") + 1)));
 									else
@@ -152,7 +153,7 @@ public class WebserverVerticle extends Verticle {
 								}
 							}
 						} catch (IOException e) {
-//							ws.reject();
+							ws.reject();
 						}
 					}
 				});
