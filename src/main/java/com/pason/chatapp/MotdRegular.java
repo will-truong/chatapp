@@ -32,7 +32,7 @@ public class MotdRegular implements Motd {
 	public void updateMotd(HashMap<String, Object> updates) {
 		if(updates != null)
 			variables.putAll(updates);
-		weatherReceived = variables.get("cond") != null && variables.get("temp") != null;
+		weatherReceived = variables.get(Motd.MOTD_COND) != null && variables.get(Motd.MOTD_TEMP) != null;
 	}
 
 	@Override
