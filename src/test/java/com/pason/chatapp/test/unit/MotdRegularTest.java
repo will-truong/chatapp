@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
+import com.pason.chatapp.Motd;
 import com.pason.chatapp.MotdRegular;
 
 /**
@@ -25,7 +26,7 @@ public class MotdRegularTest {
 		motdRegular.setMotd("hi %name%", "hey %name%");
 		assertEquals("hey %name%", motdRegular.getMotd());
 		HashMap<String, Object> updates = new HashMap<>(); //mapping of updated variables
-		updates.put("name", "will"); //insert variable "name"
+		updates.put(Motd.MOTD_NAME, "will"); //insert variable Motd.MOTD_NAME
 		motdRegular.updateMotd(updates); //execute update
 		assertEquals("hey will", motdRegular.getMotd());
 	}
@@ -35,8 +36,8 @@ public class MotdRegularTest {
 		MotdRegular motdRegular = new MotdRegular();
 		motdRegular.setMotd("its %cond% and %temp% degrees", "hi");
 		HashMap<String, Object> updates = new HashMap<>(); //mapping of updated variables
-		updates.put("cond", "rainy"); //insert variable "cond"
-		updates.put("temp", "-5"); //insert variable "temp"
+		updates.put(Motd.MOTD_COND, "rainy"); //insert variable Motd.MOTD_COND
+		updates.put(Motd.MOTD_TEMP, "-5"); //insert variable Motd.MOTD_TEMP
 		motdRegular.updateMotd(updates); //execute update
 		assertEquals("its rainy and -5 degrees", motdRegular.getMotd());
 	}
@@ -46,8 +47,8 @@ public class MotdRegularTest {
 		MotdRegular motdRegular = new MotdRegular();
 		motdRegular.setMotd("its %cond% and %temp% degrees", "hi");
 		HashMap<String, Object> updates = new HashMap<>(); //mapping of updated variables
-		updates.put("cond", null); //insert variable "cond"
-		updates.put("temp", null); //insert variable "temp"
+		updates.put(Motd.MOTD_COND, null); //insert variable Motd.MOTD_COND
+		updates.put(Motd.MOTD_TEMP, null); //insert variable Motd.MOTD_TEMP
 		motdRegular.updateMotd(updates); //execute update
 		assertEquals("hi", motdRegular.getMotd());
 	}
@@ -66,15 +67,15 @@ public class MotdRegularTest {
 		assertEquals("Hi, no message of the day set.", motdRegular.getMotd());
 		motdRegular.setMotd("%name% %cond% %temp%", "%name%");
 		HashMap<String, Object> updates = new HashMap<>();
-		updates.put("name", null);
+		updates.put(Motd.MOTD_NAME, null);
 		motdRegular.updateMotd(updates);
 		assertEquals("%name%", motdRegular.getMotd());
-		updates.put("cond", "raining");
-		updates.put("temp", "63");
+		updates.put(Motd.MOTD_COND, "raining");
+		updates.put(Motd.MOTD_TEMP, "63");
 		motdRegular.updateMotd(updates);
 		assertEquals("%name% raining 63", motdRegular.getMotd());
-		updates.put("cond", null);
-		updates.put("temp", null);
+		updates.put(Motd.MOTD_COND, null);
+		updates.put(Motd.MOTD_TEMP, null);
 		motdRegular.updateMotd(updates);
 		assertEquals("%name%", motdRegular.getMotd());
 	}
