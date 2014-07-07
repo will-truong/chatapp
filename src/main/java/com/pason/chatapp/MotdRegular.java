@@ -10,7 +10,12 @@ public class MotdRegular implements Motd {
 	HashMap<String, Object> variables = new HashMap<>();
 
 	@Override
-	public String getMotd() { //retrieves the appropriate motd based on whether there's weather info or not
+	/**
+	 * Returns the message of the day with consideration of the availability of weather information.
+	 *
+	 * @return motd if there's weather information, motdNoWeather otherwise.
+	 */
+	public String getMotd() {
 		if(isWeatherReceived()) {
 			return substVars(motdOriginalWeather);
 		}
@@ -18,18 +23,30 @@ public class MotdRegular implements Motd {
 	}
 	
 	@Override
-	public void updateMotd(HashMap<String, Object> updates) { //updates the motd with a provided mapping and checks if theres weather info
-		for(String field : updates.keySet()) {
-			variables.put(field, updates.get(field));
-		}
-		weatherReceived = variables.get("cond") != null && variables.get("temp") != null;
+	/**
+	 * Updates the variables that are substituted into the message of the day and checks if weather information is present.
+	 * 
+	 * 
+	 * @param a mapping of the variables to be updated to their updated values. 
+	 */
+	public void updateMotd(HashMap<String, Object> updates) {
+		if(updates != null)
+			variables.putAll(updates);
+		weatherReceived = variables.get(Motd.MOTD_COND) != null && variables.get(Motd.MOTD_TEMP) != null;
 	}
-	
+
 	@Override
-	public void setMotd(String weather, String noWeather) { //sets the motd's
+	/**
+	 * Sets the messages of the day to provided values.
+	 * 
+	 * @param The message of the day when there is weather information.
+	 * @param The message of the day when there's not weather information.
+	 * 
+	 */
+	public void setMotd(String weather, String noWeather) {
 		if(weather != null)
 			motdOriginalWeather = weather;
-		if(motdNoWeather != null)
+		if(noWeather != null)
 			motdNoWeather = noWeather;
 	}
 
@@ -41,7 +58,10 @@ public class MotdRegular implements Motd {
 		return str;
 	}
 
-	public boolean isWeatherReceived() { //whether or not there's weather info
+	/**
+	 * Returns whether or not there is weather information.
+	 */
+	public boolean isWeatherReceived() {
 		return weatherReceived;
 	}
 }

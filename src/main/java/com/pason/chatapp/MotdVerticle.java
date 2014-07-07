@@ -39,9 +39,8 @@ public class MotdVerticle extends Verticle {
 			public void handle(Message<JsonObject> message) {
 				JsonObject jsonMap = (JsonObject)message.body();
 				HashMap<String, Object> changes = new HashMap<String, Object>();
-				changes.put("id", jsonMap.getString("id"));
-				changes.put("name", jsonMap.getString("name"));
-				changes.put("time", (new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime())).toString());
+				changes.put(Motd.MOTD_NAME, jsonMap.getString("name"));
+				changes.put(Motd.MOTD_TIME, (new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime())).toString());
 				motd.updateMotd(changes);
 				String greeting = motd.getMotd();
 				JsonObject motdMessage = new JsonObject().putString("message", greeting).putString("sender", "SYSTEM").putString("received", new Date().toString());
@@ -58,8 +57,8 @@ public class MotdVerticle extends Verticle {
 			@Override
 			public void handle(Message<String> event) { //on successful motd editing, motd = true, and condition, temp replaced appropriately
 				HashMap<String, Object> changes = new HashMap<String, Object>();
-				changes.put("temp", ((String) event.body()).split(",")[1]);
-				changes.put("cond", (((String) event.body()).split(",")[0]).toLowerCase());
+				changes.put(Motd.MOTD_TEMP, ((String) event.body()).split(",")[1]);
+				changes.put(Motd.MOTD_COND, (((String) event.body()).split(",")[0]).toLowerCase());
 				motd.updateMotd(changes);
 			}
 		});
